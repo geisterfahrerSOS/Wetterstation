@@ -9,6 +9,8 @@ float humidCompare = 0;
 
 byte read_data();
 void start_test();
+boolean changeTemp();
+boolean changeHumid();
 
 void setup()
 {
@@ -34,20 +36,48 @@ void loop()
   //   Serial.println("-- Checksum Error!");
   // else
   //   Serial.println("-- OK");
-  if (change())
+  start_test();
+  if (changeTemp())
   {
+    Serial.println("TEMP:  ");
     Serial.println(temp);
+  }
+  if (changeHumid())
+  {
+    Serial.println("HUMID:  ");
+    Serial.println(humid);
   }
 
   delay(1000);
 }
-boolean change()
+boolean changeTemp()
 {
-  start_test();
+  boolean state = false;
   if (temp != tempCompare)
   {
+    state = true;
+  }
+  else
+  {
+    state = false;
   }
   tempCompare = temp;
+  return state;
+}
+
+boolean changeHumid()
+{
+  boolean state = false;
+  if (humid != humidCompare)
+  {
+    state = true;
+  }
+  else
+  {
+    state = false;
+  }
+  humidCompare = humid;
+  return state;
 }
 byte read_data()
 {
