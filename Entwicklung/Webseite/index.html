@@ -7,16 +7,16 @@
 
 <body>
 
-
-
-    <input id="getDateButton" type="button" onclick="document.getElementById('dateOutput').innerHTML = Date()" value="Time and Date"></button>
+    <input type='file' accept='text/plain' onchange='openFile(event)'><br>
+    <input id="fileButton" type="button" onclick="testFunc()" value="Open File"> <br>
+    <input id="getDateButton" type="button" onclick="document.getElementById('dateOutput').innerHTML = Date()" value="Time and Date"><br>
     <p id="dateOutput"></p>
     <p>Capital Sensitive</p>
     <form id="frm1" action="/action_page.php"> Search Here: <input id="searchField" type="text" name="fname">
         <input id="fancy" type="button" onclick="myFunction()" value="Search">
     </form>
     <p>Search Results: </p>
-    <p id='outputField'></p>
+    <p id='output'></p>
     <script src="main.js"></script>
 </body>
 

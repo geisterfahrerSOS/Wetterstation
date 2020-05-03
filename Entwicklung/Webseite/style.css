@@ -12,3 +12,18 @@
 #dateOutput {
     background-color: aquamarine;
 }
+
+#fileButton{
+    
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    
+}
+#output{
+    border: black;
+    width: inherit;
+    /* background-color: blue; */
+    border-style: solid;
+    padding: 15px;
+}
