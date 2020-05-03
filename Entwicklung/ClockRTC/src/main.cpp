@@ -25,7 +25,7 @@ void loop()
   while (millis() - ST1 > 1000)
   {
     DateTime now = RTC.now();
-    Serial.print(now.month(), DEC);
+    Serial.print(now.month(), DEC
     Serial.print('/');
     Serial.print(now.day(), DEC);
     Serial.print('/');

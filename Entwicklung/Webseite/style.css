@@ -1,0 +1,14 @@
+#fancy {
+    background-color: black;
+    color: aliceblue;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: large;
+}
+
+#searchField {
+    background-color: white;
+}
+
+#dateOutput {
+    background-color: aquamarine;
+}
