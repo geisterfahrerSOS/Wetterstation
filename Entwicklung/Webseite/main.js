@@ -92,17 +92,14 @@ const testFunc = () => {
 
 function mixArray(array) {
   let backArray = [];
-  let text = "";
   const arrayLength = array.length;
-  let i = 0;
   let upperRandom;
   let lowerRandom;
-  for (let count = 0; i < arrayLength-2; i++) {
-    lowerRandom = Math.round((Math.random() * array.length) - 2);
+  for (let i = 0; i < arrayLength - 2; i++) {
+    lowerRandom = Math.round(Math.random() * array.length - 2);
     console.log(lowerRandom);
     backArray.push(array.slice(lowerRandom, lowerRandom + 1));
     array.splice(lowerRandom, 1);
-    
   }
   return backArray;
 }
@@ -115,26 +112,27 @@ var openFile = function (event) {
     document.getElementById("output").innerHTML = text.slice(0, 20);
     let syntax = [".", ",", "!", "?", ":", ";", "(", ")", "[", "]"];
     let words = text.split(" ");
-    let modiWords = words.map(item => {
-        
-      for (let count of syntax) {
-        console.log("mosi"+syntax[count]);
-        if (item.endsWith()) {
-            console.log("endsWith");
-          return item.slice(0, 2);
-        }
-        if (item.startsWith(syntax[count])) {
-          return item.slice(1, 3);
-        }
-      }
-      return item;
+    let modiWords = words.map((item) => {
+      checkFor(item);
     });
+    console.log(words);
     console.log(modiWords);
     // console.log(mixArray(modiWords));
   };
   reader.readAsText(input.files[0]);
 };
-
+const checkFor = (item) => {
+  for (let count of syntax) {
+    console.log(count);
+    if (item.endsWith(count)) {
+      return checkFor(item.slice(0, item.length - 1));
+    }
+    if (item.startsWith(count)) {
+      return checkFor(item.slice(1, item.length));
+    }
+  }
+  return item;
+}
 function getLocalFile(file) {
   var rawFile = new XMLHttpRequest();
   rawFile.open(
