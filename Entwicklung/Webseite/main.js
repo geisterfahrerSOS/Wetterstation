@@ -61,31 +61,27 @@ const myFunction = () => {
   ];
 
   let searchValue = document.getElementById("searchField").value.toLowerCase();
+  // console.log(searchValue);
   document.getElementById("output").innerHTML = "";
-  console.log(searchValue);
-  let foundElements = modiWords.filter(function (item) {
-    // console.log(item);
+  // console.log(modiWords);
+  let foundElements = randomLorem.filter(function (item) {
     if (item.toLowerCase().includes(searchValue)) {
       return item;
     }
   });
+
   let i = 0;
+  let output = document.getElementById("output");
   foundElements.forEach(function (item) {
     i++;
-    document.getElementById("output").innerHTML += i + ") " + item + "<br>";
-    if(foundElements.length == 0){
-      document.getElementById("output").innerHTML = "Sorry, no elements found"
-    }
+    output.innerHTML += i + ") " + item + "<br>";
+    output.style.borderStyle = "soild";
+    output.style.borderColor = "black";
   });
-  // let first = Math.round(document.getElementById("searchField").value);
-  // console.log(first);
-  // if (first < randomLorem.length) {
-  //     for (let i = 1; i < first + 1; i++) {
-  //         document.getElementById("outputField").innerHTML += i + ')  ' + randomLorem[i - 1] + "<br>";
-  //     }
-  // } else {
-  //     document.getElementById("outputField").innerHTML = "There has been a Problem...<br>";
-  // }
+  if (foundElements.length == 0) {
+    output.style.borderStyle = "none";
+    output.innerHTML = "Sorry, no elements found";
+  }
 };
 const testFunc = () => {
   let str = "";
@@ -106,6 +102,7 @@ function mixArray(array) {
   }
   return backArray;
 }
+
 const checkFor = (item, i) => {
   let syntax = [".", ",", "!", "?", ":", ";", "(", ")", "[", "]", "'"];
   if (i < 10) {
@@ -114,15 +111,18 @@ const checkFor = (item, i) => {
         return checkFor(item.slice(0, item.length - 1), i + 1);
       }
       if (item.startsWith(count)) {
-        return checkFor(item.slice(1, item.length), i+ 1);
+        return checkFor(item.slice(1, item.length), i + 1);
       }
     }
     console.log(item);
   } else {
-    console.log(item + ":  There has bee an error, too many special characters!");
+    console.log(
+      item + ":  There has bee an error, too many special characters!"
+    );
   }
   return item;
 };
+
 let words = [];
 let modiWords = [];
 var openFile = function (event) {
@@ -131,14 +131,11 @@ var openFile = function (event) {
   var reader = new FileReader();
   reader.onload = function () {
     var text = reader.result;
-    document.getElementById("output").innerHTML = text.slice(0, 20);
+
     words = text.split(" ");
     modiWords = words.map((item) => {
       return checkFor(item, 0);
     });
-    console.log(words);
-    console.log(modiWords);
-    // console.log(mixArray(modiWords));
   };
   reader.readAsText(input.files[0]);
 };

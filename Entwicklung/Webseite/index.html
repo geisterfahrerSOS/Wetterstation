@@ -8,11 +8,16 @@
 <body>
 
     <input type='file' accept='text/plain' onchange='openFile(event)'><br>
-    <input id="fileButton" type="button" onclick="testFunc()" value="Test"> <br>
+    <input id="testButton" type="button" onclick="testFunc()" value="Test"> <br>
+    <form id="frm2" action="/action_page.php"> These symbols will be deleted  <input id="symbolExclude" type="text" name="symbolsExcl">
+        <input id="setSymbols" type="button" onclick="myFunction()" value="Set"></form>
+    <p id="comment">Put the symbols you would like to exclude in quotation marks separated with a semicolon.</p><br>
+    </form>
     <input id="getDateButton" type="button" onclick="document.getElementById('dateOutput').innerHTML = Date()" value="Time and Date"><br>
     <p id="dateOutput"></p>
     <p>Capital Sensitive</p>
-    <form id="frm1" action="/action_page.php"> Search Here: <input id="searchField" type="text" name="fname">
+    <form id="frm1" action="action_page.php"> Search Here: 
+        <input id="searchField" type="text" name="fname">
         <input id="fancy" type="button" onclick="myFunction()" value="Search">
     </form>
     <p>Search Results: </p>
