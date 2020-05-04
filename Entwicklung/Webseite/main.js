@@ -63,7 +63,7 @@ const myFunction = () => {
   let searchValue = document.getElementById("searchField").value.toLowerCase();
   document.getElementById("output").innerHTML = "";
   console.log(searchValue);
-  let foundElements = randomLorem.filter(function (item) {
+  let foundElements = modiWords.filter(function (item) {
     // console.log(item);
     if (item.toLowerCase().includes(searchValue)) {
       return item;
@@ -73,6 +73,9 @@ const myFunction = () => {
   foundElements.forEach(function (item) {
     i++;
     document.getElementById("output").innerHTML += i + ") " + item + "<br>";
+    if(foundElements.length == 0){
+      document.getElementById("output").innerHTML = "Sorry, no elements found"
+    }
   });
   // let first = Math.round(document.getElementById("searchField").value);
   // console.log(first);
@@ -103,6 +106,25 @@ function mixArray(array) {
   }
   return backArray;
 }
+const checkFor = (item, i) => {
+  let syntax = [".", ",", "!", "?", ":", ";", "(", ")", "[", "]", "'"];
+  if (i < 10) {
+    for (let count of syntax) {
+      if (item.endsWith(count)) {
+        return checkFor(item.slice(0, item.length - 1), i + 1);
+      }
+      if (item.startsWith(count)) {
+        return checkFor(item.slice(1, item.length), i+ 1);
+      }
+    }
+    console.log(item);
+  } else {
+    console.log(item + ":  There has bee an error, too many special characters!");
+  }
+  return item;
+};
+let words = [];
+let modiWords = [];
 var openFile = function (event) {
   var input = event.target;
 
@@ -110,10 +132,9 @@ var openFile = function (event) {
   reader.onload = function () {
     var text = reader.result;
     document.getElementById("output").innerHTML = text.slice(0, 20);
-    let syntax = [".", ",", "!", "?", ":", ";", "(", ")", "[", "]"];
-    let words = text.split(" ");
-    let modiWords = words.map((item) => {
-      checkFor(item);
+    words = text.split(" ");
+    modiWords = words.map((item) => {
+      return checkFor(item, 0);
     });
     console.log(words);
     console.log(modiWords);
@@ -121,32 +142,3 @@ var openFile = function (event) {
   };
   reader.readAsText(input.files[0]);
 };
-const checkFor = (item) => {
-  for (let count of syntax) {
-    console.log(count);
-    if (item.endsWith(count)) {
-      return checkFor(item.slice(0, item.length - 1));
-    }
-    if (item.startsWith(count)) {
-      return checkFor(item.slice(1, item.length));
-    }
-  }
-  return item;
-}
-function getLocalFile(file) {
-  var rawFile = new XMLHttpRequest();
-  rawFile.open(
-    "GET",
-    "file:///C:UsersmarcoDocumentsMarcoSchuleInformatikWetterstationWetterstationEntwicklungWebseite\text.txt",
-    false
-  );
-  rawFile.onreadystatechange = function () {
-    if (rawFile.readyState === 4) {
-      if (rawFile.status === 200 || rawFile.status == 0) {
-        var allText = rawFile.responseText;
-        alert(allText);
-      }
-    }
-  };
-  rawFile.send(null);
-}
