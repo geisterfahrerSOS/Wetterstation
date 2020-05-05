@@ -60,6 +60,7 @@ const myFunction = () => {
         "Marco",
     ];
 
+<<<<<<< HEAD
     let searchValue = document.getElementById("searchField").value.toLowerCase();
     document.getElementById("output").innerHTML = "";
     console.log(searchValue);
@@ -83,6 +84,30 @@ const myFunction = () => {
     // } else {
     //     document.getElementById("outputField").innerHTML = "There has been a Problem...<br>";
     // }
+=======
+  let searchValue = document.getElementById("searchField").value.toLowerCase();
+  // console.log(searchValue);
+  document.getElementById("output").innerHTML = "";
+  // console.log(modiWords);
+  let foundElements = randomLorem.filter(function (item) {
+    if (item.toLowerCase().includes(searchValue)) {
+      return item;
+    }
+  });
+
+  let i = 0;
+  let output = document.getElementById("output");
+  foundElements.forEach(function (item) {
+    i++;
+    output.innerHTML += i + ") " + item + "<br>";
+    output.style.borderStyle = "soild";
+    output.style.borderColor = "black";
+  });
+  if (foundElements.length == 0) {
+    output.style.borderStyle = "none";
+    output.innerHTML = "Sorry, no elements found";
+  }
+>>>>>>> 420106eb603819f1348745e6a9794cfac03f6f03
 };
 const testFunc = () => {
     let str = "";
@@ -91,6 +116,7 @@ const testFunc = () => {
 };
 
 function mixArray(array) {
+<<<<<<< HEAD
     let backArray = [];
     let text = "";
     const arrayLength = array.length;
@@ -152,3 +178,54 @@ function getLocalFile(file) {
     };
     rawFile.send(null);
 }
+=======
+  let backArray = [];
+  const arrayLength = array.length;
+  let upperRandom;
+  let lowerRandom;
+  for (let i = 0; i < arrayLength - 2; i++) {
+    lowerRandom = Math.round(Math.random() * array.length - 2);
+    console.log(lowerRandom);
+    backArray.push(array.slice(lowerRandom, lowerRandom + 1));
+    array.splice(lowerRandom, 1);
+  }
+  return backArray;
+}
+
+const checkFor = (item, i) => {
+  let syntax = [".", ",", "!", "?", ":", ";", "(", ")", "[", "]", "'"];
+  if (i < 10) {
+    for (let count of syntax) {
+      if (item.endsWith(count)) {
+        return checkFor(item.slice(0, item.length - 1), i + 1);
+      }
+      if (item.startsWith(count)) {
+        return checkFor(item.slice(1, item.length), i + 1);
+      }
+    }
+    console.log(item);
+  } else {
+    console.log(
+      item + ":  There has bee an error, too many special characters!"
+    );
+  }
+  return item;
+};
+
+let words = [];
+let modiWords = [];
+var openFile = function (event) {
+  var input = event.target;
+
+  var reader = new FileReader();
+  reader.onload = function () {
+    var text = reader.result;
+
+    words = text.split(" ");
+    modiWords = words.map((item) => {
+      return checkFor(item, 0);
+    });
+  };
+  reader.readAsText(input.files[0]);
+};
+>>>>>>> 420106eb603819f1348745e6a9794cfac03f6f03
