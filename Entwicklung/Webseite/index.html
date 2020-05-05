@@ -6,22 +6,17 @@
 </head>
 
 <body>
+    <input id="fileSelect" type='file' accept='text/plain' onchange='openFile(event)'><br><br>
 
-<<<<<<< HEAD
-    <input id="fileSelect" type='file' accept='text/plain' onchange='openFile(event)'><br>
-    <input id="fileButton" type="button" onclick="testFunc()" value="Open File"> <br>
-=======
-    <input type='file' accept='text/plain' onchange='openFile(event)'><br>
-    <input id="testButton" type="button" onclick="testFunc()" value="Test"> <br>
-    <form id="frm2" action="/action_page.php"> These symbols will be deleted  <input id="symbolExclude" type="text" name="symbolsExcl">
-        <input id="setSymbols" type="button" onclick="myFunction()" value="Set"></form>
-    <p id="comment">Put the symbols you would like to exclude in quotation marks separated with a semicolon.</p><br>
+    <form id="frm0" action="action_page.php"> Put in the symbols you would like to exclude
+        <input id="exclusionSymbols" type="text" name="fname">
+        <input id="enterButton" type="button" onclick="getExclusion()" value="Enter">
     </form>
->>>>>>> 420106eb603819f1348745e6a9794cfac03f6f03
-    <input id="getDateButton" type="button" onclick="document.getElementById('dateOutput').innerHTML = Date()" value="Time and Date"><br>
-    <p id="dateOutput"></p>
-    <p>Capital Sensitive</p>
-    <form id="frm1" action="action_page.php"> Search Here: 
+    <div id='comment'>Separate the Symbols with an <strong>x</strong></div><br>
+    <p style="color:grey;">
+        <Strong>Capital Sensitive</Strong>
+    </p>
+    <form id="frm1" action="action_page.php"> Search Here:
         <input id="searchField" type="text" name="fname">
         <input id="fancy" type="button" onclick="myFunction()" value="Search">
     </form>
