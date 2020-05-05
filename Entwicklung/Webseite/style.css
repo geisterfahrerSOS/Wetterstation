@@ -13,17 +13,21 @@
     background-color: aquamarine;
 }
 
-#fileButton{
-    
+#fileButton {
     padding: 10px;
     margin-top: 10px;
     margin-bottom: 10px;
-    
 }
-#output{
+
+#output {
     border: black;
     width: inherit;
     /* background-color: blue; */
     border-style: solid;
     padding: 15px;
+}
+
+#fileSelect {
+    border-radius: 4px;
+    background-color: black;
 }

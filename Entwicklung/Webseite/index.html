@@ -7,7 +7,7 @@
 
 <body>
 
-    <input type='file' accept='text/plain' onchange='openFile(event)'><br>
+    <input id="fileSelect" type='file' accept='text/plain' onchange='openFile(event)'><br>
     <input id="fileButton" type="button" onclick="testFunc()" value="Open File"> <br>
     <input id="getDateButton" type="button" onclick="document.getElementById('dateOutput').innerHTML = Date()" value="Time and Date"><br>
     <p id="dateOutput"></p>
