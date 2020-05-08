@@ -1,0 +1,32 @@
+<html>
+
+<head>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <input id="fileSelect" type='file' accept='text/plain' onchange='openFile(event)'><br><br>
+
+    <form id="frm0" action="action_page.php"> Put in the symbols you would like to exclude
+        <input id="exclusionSymbols" type="text" name="fname">
+        <input id="enterButton" type="button" onclick="getExclusion()" value="Enter">
+    </form>
+    <div id='comment'>Separate the Symbols with an <strong>x</strong></div><br>
+    <p style="color:grey;">
+        <Strong>Capital Sensitive</Strong>
+    </p>
+    <form id="frm1" action="action_page.php"> Search Here:
+        <input id="searchField" type="text" name="fname">
+        <input id="fancy" type="button" onclick="myFunction()" value="Search">
+    </form>
+    <p>Search Results: </p>
+    <p id='output'></p>
+    <script src="main.js"></script>
+</body>
+
+
+
+
+
+</html>

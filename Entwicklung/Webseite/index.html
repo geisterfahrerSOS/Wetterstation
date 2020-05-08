@@ -1,32 +1,204 @@
 <html>
+<title>This is a test website</title>
 
 <head>
-
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+        
+        button {
+            padding: 10px;
+            margin: 10px;
+        }
+        
+        #xmlOutput {
+            margin: 10px;
+            padding: 10px;
+            background-color: grey;
+            border-radius: 20px;
+            border-style: dashed;
+        }
+        
+        #displayButton {
+            background-color: black;
+        }
+        
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-radius: 3px;
+            padding: 3px;
+            text-align: center;
+            margin: 10px;
+            margin-top: -3px;
+        }
+        
+        th {
+            padding: 10px;
+        }
+        
+        .slidecontainer {
+            width: 100%;
+            /* Width of the outside container */
+        }
+        /* The slider itself */
+        
+        .slider {
+            -webkit-appearance: none;
+            /* Override default CSS styles */
+            appearance: none;
+            width: 100%;
+            /* Full-width */
+            height: 18px;
+            /* Specified height */
+            background: #d3d3d3;
+            /* Grey background */
+            border-radius: 10px;
+            outline: none;
+            /* Remove outline */
+            opacity: 0.7;
+            /* Set transparency (for mouse-over effects on hover) */
+            -webkit-transition: .2s;
+            /* 0.2 seconds transition on hover */
+            transition: opacity .2s;
+        }
+        /* Mouse-over effects */
+        
+        .slider:hover {
+            opacity: 1;
+            /* Fully shown on mouse-over */
+        }
+        /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            /* Override default look */
+            appearance: none;
+            width: 30px;
+            /* Set a specific slider handle width */
+            height: 30px;
+            border-radius: 15px;
+            /* Slider handle height */
+            background: #4CAF50;
+            /* Green background */
+            cursor: pointer;
+            /* Cursor on hover */
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 25px;
+            /* Set a specific slider handle width */
+            height: 25px;
+            /* Slider handle height */
+            background: #4CAF50;
+            /* Green background */
+            cursor: pointer;
+            /* Cursor on hover */
+        }
+    </style>
 </head>
 
 <body>
-    <input id="fileSelect" type='file' accept='text/plain' onchange='openFile(event)'><br><br>
 
-    <form id="frm0" action="action_page.php"> Put in the symbols you would like to exclude
-        <input id="exclusionSymbols" type="text" name="fname">
-        <input id="enterButton" type="button" onclick="getExclusion()" value="Enter">
-    </form>
-    <div id='comment'>Separate the Symbols with an <strong>x</strong></div><br>
-    <p style="color:grey;">
-        <Strong>Capital Sensitive</Strong>
-    </p>
-    <form id="frm1" action="action_page.php"> Search Here:
-        <input id="searchField" type="text" name="fname">
-        <input id="fancy" type="button" onclick="myFunction()" value="Search">
-    </form>
-    <p>Search Results: </p>
-    <p id='output'></p>
-    <script src="main.js"></script>
+    <button onclick="loadXMLDoc()">Fetch Data</button><br>
+    <div class="slidecontainer">
+        <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+    </div>
+    <div id="sliderOutput">
+
+    </div>
+    <button id='displayButton' onclick="onDisplayButton()">Display Data</button>
+    <div id="xmlOutput">This is where the html output will appear</div>
+    <script>
+        var stampLabels = [];
+        var stampDataDone = [];
+
+        function loadXMLDoc() {
+            var xhttp = new XMLHttpRequest();
+            var values = [];
+            var timeStamps = [];
+            var labels = [];
+            var data = [];
+            var stampData = [];
+
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    values = this.responseText.split(",");
+                    var buffer = [];
+                    labels = values.slice(0, 65);
+                    data = values.slice(65);
+                    stampLabels.push(labels.slice(0, 27));
+                    stampLabels.push(labels.slice(27, 54));
+                    stampLabels.push(labels.slice(55, 65));
+                    for (var i = 0; i < 27; i++) {
+                        stampData.push(data.slice(i * 11, (i + 1) * 11));
+                    }
+                    stampDataDone = stampData.map(item => {
+                        return item.slice(1, item.length).map(item1 => {
+                            item1 = checkFor(item1, 0, [' ', ';', '.']);
+                            if (item1 === "") {
+                                return item1.replace('', '-');
+                            }
+                            return item1;
+                        });
+                    });
+                    console.log(data);
+                    console.log(stampData);
+                }
+            };
+            xhttp.open("GET", "Marco_Deuritz_2020-04-16_16-30-25.CSV", true);
+            xhttp.send();
+
+            document.getElementById('displayButton').style.backgroundColor = "green";
+        }
+
+        function onDisplayButton() {
+            displayTable(stampLabels[2], stampDataDone);
+        }
+
+        function displayTable(label = "0", data = "0") {
+            var outputBox = document.getElementById('xmlOutput');
+            var output = "";
+            output += "<table>";
+            output += "<tr>";
+
+            label.forEach(item => {
+
+                output += "<th>" + item + "</th>";
+            });
+            output += "</tr>";
+            output += "<br>";
+            data.forEach(item => {
+                output += "<tr>";
+                item.forEach(item1 => {
+                    output += "<td>" + item1 + "</t>";
+                });
+                output += "</tr>";
+            });
+            output += "</table>";
+            outputBox.innerHTML = output;
+        }
+
+        function checkFor(item, i, syntax) {
+            if (i < 10) {
+                for (let count of syntax) {
+                    if (item.endsWith(count)) {
+                        return checkFor(item.slice(0, item.length - 1), i + 1, syntax);
+                    }
+                    if (item.startsWith(count)) {
+                        return checkFor(item.slice(1, item.length), i + 1, syntax);
+                    }
+                }
+            } else {
+                console.log(
+                    item + ":  There has bee an error, too many special characters!"
+                );
+            }
+            return item;
+        };
+    </script>
 </body>
-
-
-
-
 
 </html>
