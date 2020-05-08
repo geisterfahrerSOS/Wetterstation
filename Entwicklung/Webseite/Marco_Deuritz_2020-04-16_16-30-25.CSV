@@ -1,7 +1,7 @@
 Name,Sport,Date,Start time,Duration,Total distance (km),Average heart rate (bpm),Average speed (km/h),Max speed (km/h),Average pace (min/km),Max pace (min/km),Calories,Fat percentage of calories(%),Average cadence (rpm),Average stride length (cm),Running index,Training load,Ascent (m),Descent (m),Average power (W),Max power (W),Notes,Height (cm),Weight (kg),HR max,HR sit,VO2max,
 Marco Deuritz,ROAD_BIKING,16/04/2020,16:30:25,03:21:19,101.94,,30.4,60.0,01:58,01:00,1137,47,,,,209,767,743,,,,150.0,44.0,210,55,60,
 Sample rate,Time,HR (bpm),Speed (km/h),Pace (min/km),Cadence,Altitude (m),Stride length (m),Distances (m),Temperatures (C),Power (W),
-1,00:00:00,31,23.1,02:36,,0,,16.67,,,
+1,00:00:00,,23.1,02:36,,0,,16.67,,,
 ,00:00:01,,23.1,02:36,,0,,32.10,,,
 ,00:00:02,,23.5,02:33,,0,,38.90,,,
 ,00:00:03,,23.9,02:31,,0,,45.70,,,
