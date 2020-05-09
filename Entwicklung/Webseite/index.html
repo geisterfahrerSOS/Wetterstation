@@ -1,90 +1,135 @@
 <html>
-  <head>
+
+<head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-    />
-  </head>
-  <body>
-    <button onclick="loadXMLDoc()" style="margin: 20px;">Fetch Data</button
-    ><br />
-    <button id="displayButton" onclick="onDisplayButton()">Display Data</button
-    ><br />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" />
+    <style>
+        body {
+            margin: 20px;
+        }
+        
+        table,
+        th,
+        td {
+            text-align: center;
+            padding: 2px;
+            border: solid;
+            border-radius: 2px;
+        }
+        
+        button {
+            margin: inherit;
+        }
+        
+        #xmlOutput {
+            margin: inherit;
+            float: left;
+        }
+    </style>
+</head>
+
+<body>
+    <form id="frm1" action="action_page.php">
+        From
+        <input id="start" type="text" name="bottom" />
+        <input id="stop" type="text" name="top" />
+        <input id="enter" type="button" onclick="loadXMLDoc()" value="Load Data" />
+    </form>
+    <br />
+    <button id="displayButton" onclick="display()">Display Data</button><br />
+    <div class="container" style="float: left;">
+        <canvas id="myChart" width="100%" height="100%"></canvas>
+    </div>
+    <br />
     <div id="xmlOutput">This is where the html output will appear</div>
     <br />
-    <div class="container">
-      <canvas id="myChart" width="100%" height="50%"></canvas>
-    </div>
+
     <script>
-        var stampLabels = [];
-        var stampDataDone = [];
-        let dataMerge = [];
+        var data = [];
+        var dataInv = [];
+        let one = 0;
+        let two = 0;
+        let myChart;
 
         function loadXMLDoc() {
+            data = [];
+            dataInv = [];
+            one = document.getElementById("start").value;
+            two = document.getElementById("stop").value;
+            console.log(one);
+            console.log(two);
             var xhttp = new XMLHttpRequest();
             var values = [];
-            var timeStamps = [];
-            var labels = [];
-            var data = [];
-            var stampData = [];
-
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
-                    values = this.responseText.split(",");
-                    var buffer = [];
-                    labels = values.slice(0, 65);
-                    data = values.slice(65);
-                    stampLabels.push(labels.slice(0, 27));
-                    stampLabels.push(labels.slice(27, 54));
-                    stampLabels.push(labels.slice(55, 65));
-                    for (var i = 0; i < 27; i++) {
-                        stampData.push(data.slice(i * 11, (i + 1) * 11));
+                    values = this.responseText.split(",").slice(55);
+                    data.push(values.slice(0, 11));
+                    for (var i = one; i < two; i++) {
+                        data.push(values.slice(11 + i * 11, 11 + (i + 1) * 11));
                     }
-                    stampDataDone = stampData.map(item => {
-                        return item.slice(1, item.length).map(item1 => {
-                            item1 = checkFor(item1, 0, [' ', ';', '.']);
+
+                    data = data.map((item) => {
+                        return item.slice(0, item.length - 1).map((item1) => {
+                            item1 = checkFor(item1, 0, [" ", ";", "."]);
                             if (item1 === "") {
-                                return item1.replace('', '-');
+                                return item1.replace("", "-");
                             }
                             return item1;
                         });
                     });
-                    var buff = 0
-                    stampDataDone.forEach(item =>{
-                       buff = parseInt(item[2]);
-                       dataMerge.push(buff);
-                   });
-                    
+
+                    for (let i = 0; i < data[0].length; i++) {
+                        var buffer = [];
+                        for (let e = 0; e < data.length; e++) {
+                            buffer.push(data[e][i]);
+                        }
+                        dataInv.push(buffer);
+                    }
                 }
             };
-            xhttp.open("GET", "Marco_Deuritz_2020-04-16_16-30-25.CSV", true);
+            xhttp.open("GET", "Marco_Deuritz_2020-05-09_12-21-54.CSV", true);
             xhttp.send();
 
-            document.getElementById('displayButton').style.backgroundColor = "green";
+            document.getElementById("displayButton").style.backgroundColor =
+                "green";
+            removeData(myChart);
+            addData(myChart, "Altitude [m]", dataInv[5].slice(1));
+        }
+
+        function removeData(chart) {
+            chart.data.labels.pop();
+            chart.data.datasets.forEach((dataset) => {
+                dataset.data.pop();
+            });
+            chart.update();
+        }
+
+        function addData(chart, label, data) {
+            chart.data.labels.push(label);
+            chart.data.datasets.forEach((dataset) => {
+                dataset.data.push(data);
+            });
+            chart.update();
+        }
+
+        function display() {
+            displayTable();
             drawChart();
         }
 
-        function onDisplayButton() {
-            displayTable(stampLabels[2], stampDataDone);
-        }
-
-        function displayTable(label = "0", data = "0") {
-            var outputBox = document.getElementById('xmlOutput');
+        function displayTable() {
+            var outputBox = document.getElementById("xmlOutput");
             var output = "";
             output += "<table>";
             output += "<tr>";
-
-            label.forEach(item => {
-
+            data[0].forEach((item) => {
                 output += "<th>" + item + "</th>";
             });
             output += "</tr>";
-            output += "<br>";
-            data.forEach(item => {
+            data.slice(1).forEach((item) => {
                 output += "<tr>";
-                item.forEach(item1 => {
-                    output += "<td>" + item1 + "</t>";
+                item.forEach((item1) => {
+                    output += "<td>" + item1 + "</td>";
                 });
                 output += "</tr>";
             });
@@ -108,67 +153,80 @@
                 );
             }
             return item;
-        };
-function drawChart(){
-    console.log(dataMerge);
-      let ctx = document.getElementById("myChart").getContext('2d');
-      let chartSettings = {
-        type: "line",
-        data: {
-          labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-          datasets: [
-            {
-              label: "# of Votes",
-              data: dataMerge.slice(0,6),
-              backgroundColor: [
-                "rgba(255, 99, 132, 0.2)",
-                "rgba(54, 162, 235, 0.2)",
-                "rgba(255, 206, 86, 0.2)",
-                "rgba(75, 192, 192, 0.2)",
-                "rgba(153, 102, 255, 0.2)",
-                "rgba(255, 159, 64, 0.2)",
-              ],
-              borderColor: [
-                "rgba(255, 99, 132, 1)",
-                "rgba(54, 162, 235, 1)",
-                "rgba(255, 206, 86, 1)",
-                "rgba(75, 192, 192, 1)",
-                "rgba(153, 102, 255, 1)",
-                "rgba(255, 159, 64, 1)",
-              ],
-              borderWidth: 2,
-              fill: "none",
-              borderColor:"rgba(120, 190, 240, 0.8)",
-              borderDash: [10, 10],
-              cubicInterpolationMode: "default",
-              lineTension: 0.4,
-            },
-          ],
-        },
-        options: {
-        legend: {
-            position: "left",
-        },
-          scales: {
-            yAxes: [
-              {
-                ticks: {
-                  beginAtZero: true,
+        }
+
+        function drawChart() {
+            let ctx = document.getElementById("myChart").getContext("2d");
+            let chartSettings = {
+                type: "line",
+                data: {
+                    labels: dataInv[0].slice(1),
+                    datasets: [
+                        // {
+                        //   label: "Speed [km/h]",
+                        //   data: dataInv[2],
+                        //   borderWidth: 1,
+                        //   fill: "rgba(120, 190, 220, 0.3)",
+                        //   borderColor: "rgba(120, 190, 220, 1)",
+                        //   borderDash: [10, 10],
+                        //   fill: true,
+                        //   cubicInterpolationMode: "default",
+                        //   lineTension: 0.4,
+                        //   pointRadius: 0,
+                        // },
+                        {
+                            label: "Altitude [m]",
+                            data: dataInv[5].slice(1),
+                            borderWidth: 1,
+                            fill: "rgba(30, 190, 220, 0.3)",
+                            borderColor: "rgba(30, 190, 220, 1)",
+                            borderDash: [10, 10],
+                            fill: true,
+                            lineTension: 0.3,
+                            pointRadius: 0,
+                        },
+                        // {
+                        //   label: "Distance [m]",
+                        //   data: dataInv[7].slice(1),
+                        //   borderWidth: 1,
+                        //   fill: "rgba(190, 190, 220, 0.3)",
+                        //   borderColor: "rgba(190, 190, 220, 1)",
+                        //   borderDash: [10, 10],
+                        //   fill: true,
+                        //   cubicInterpolationMode: "default",
+                        //   lineTension: 0.4,
+                        //   pointRadius: 0,
+                        // },
+                    ],
                 },
-              },
-            ],
-            xAxes: [
-              {
-                ticks: {
-                  beginAtZero: true,
+                options: {
+                    responsive: true,
+                    legend: {
+                        display: false,
+                        position: "left",
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                // beginAtZero: false,
+                                min: 500,
+                            },
+                        }, ],
+                        xAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                            },
+                        }, ],
+                    },
+                    tooltips: {
+                        intersect: false,
+                    },
                 },
-              },
-            ],
-          },
-        },
-      }
-      let myChart = new Chart(ctx, chartSettings);
-    }
+            };
+            let myChart = new Chart(ctx, chartSettings);
+            myChart.update();
+        }
     </script>
-  </body>
+</body>
+
 </html>
