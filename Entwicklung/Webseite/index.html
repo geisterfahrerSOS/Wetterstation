@@ -15,56 +15,64 @@
             padding: 2px;
             border: solid;
             border-radius: 2px;
+            border-collapse: collapse;
         }
         
         button {
             margin: inherit;
         }
         
-        #xmlOutput {
+        #displayButton {
+            background-color: red;
+        }
+        
+        #xml {
             margin: inherit;
             float: left;
+        }
+        
+        #xmlOutput {
+            background-color: grey;
         }
     </style>
 </head>
 
 <body>
-    <form id="frm1" action="action_page.php">
-        From
-        <input id="start" type="text" name="bottom" />
-        <input id="stop" type="text" name="top" />
-        <input id="enter" type="button" onclick="loadXMLDoc()" value="Load Data" />
+    <form id="frm2" action="action_page.php">
+        <input id="fullRangeCheck" type="checkbox" /><label>&nbsp Get Full Range</label><br> From
+        <input id="start" title="Start Range" type="text" />
+        <input id="stop" title="Stop Range" type="text" />
+        <input id="enter" type="button" onclick="getDataRange()" value="Set Data Range" />
     </form>
-    <br />
-    <button id="displayButton" onclick="display()">Display Data</button><br />
-    <div class="container" style="float: left;">
+    <button id="displayButton" onclick="displayData()">Display Data</button><br />
+    <div class="container" height="50%">
         <canvas id="myChart" width="100%" height="100%"></canvas>
     </div>
     <br />
-    <div id="xmlOutput">This is where the html output will appear</div>
+    <div id="xmlOutput">This is where the html outputText will appear</div>
     <br />
 
     <script>
         var data = [];
         var dataInv = [];
-        let one = 0;
-        let two = 0;
+        let beginRange;
+        let stopRange;
+        let rangeSet = false;
         let myChart;
+        let fullRangeBool = false;
+        let parseDataset = [];
+        loadXMLDoc();
 
         function loadXMLDoc() {
             data = [];
             dataInv = [];
-            one = document.getElementById("start").value;
-            two = document.getElementById("stop").value;
-            console.log(one);
-            console.log(two);
             var xhttp = new XMLHttpRequest();
             var values = [];
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                     values = this.responseText.split(",").slice(55);
                     data.push(values.slice(0, 11));
-                    for (var i = one; i < two; i++) {
+                    for (var i = 0; i < values.length / 11; i++) {
                         data.push(values.slice(11 + i * 11, 11 + (i + 1) * 11));
                     }
 
@@ -77,7 +85,7 @@
                             return item1;
                         });
                     });
-
+                    //Inverts Data; Rows and Columns are switched
                     for (let i = 0; i < data[0].length; i++) {
                         var buffer = [];
                         for (let e = 0; e < data.length; e++) {
@@ -85,15 +93,37 @@
                         }
                         dataInv.push(buffer);
                     }
-                }
-            };
-            xhttp.open("GET", "Marco_Deuritz_2020-05-09_12-21-54.CSV", true);
-            xhttp.send();
 
-            document.getElementById("displayButton").style.backgroundColor =
-                "green";
-            removeData(myChart);
-            addData(myChart, "Altitude [m]", dataInv[5].slice(1));
+
+
+                    let idCount = 0;
+                    data[0].forEach(item => {
+                        let input = document.createElement('input');
+                        let label = document.createElement('label');
+                        let newline = document.createElement('br');
+                        input.type = 'checkbox';
+                        input.id = 'ID:' + idCount;
+                        label.innerHTML = '&nbsp' + item;
+                        document.body.appendChild(input);
+                        document.body.appendChild(label);
+                        document.body.appendChild(newline);
+                        i++;
+                    });
+                }
+
+            };
+            xhttp.open("GET", "test.CSV", true);
+            xhttp.send();
+        }
+
+        function getDataRange() {
+            fullRangeBool = document.getElementById('fullRangeCheck').checked;
+            beginRange = Number(document.getElementById("start").value);
+            stopRange = Number(document.getElementById("stop").value);
+            console.log(beginRange);
+            console.log(stopRange);
+            rangeSet = true;
+            document.getElementById("displayButton").style.backgroundColor = "green";
         }
 
         function removeData(chart) {
@@ -112,29 +142,56 @@
             chart.update();
         }
 
-        function display() {
-            displayTable();
-            drawChart();
+        function dataSetManager() {
+            parseDataset = [];
+            for (let i = 0; i < data[0].length, i++) {
+                if (documnet.body.input.id == 'ID:' + i) {
+                    parseDataset[i] = documnet.body.input.value;
+                }
+            }
+
+
+        }
+
+        function displayData() {
+            if (rangeSet) {
+                // displayTable();
+                drawChart();
+                console.log(typeof checkRange(dataInv[2]).map(item => parseFloat(item)));
+            } else {
+                alert("First Enter Your Data Range...");
+            }
+
+        }
+
+        function checkRange(array) {
+            console.log("BoolRange" + fullRangeBool)
+            if (fullRangeBool) {
+                return array.slice(1, data.length);
+            } else {
+                return array.slice(1 + beginRange, 1 + stopRange);
+            }
         }
 
         function displayTable() {
             var outputBox = document.getElementById("xmlOutput");
-            var output = "";
-            output += "<table>";
-            output += "<tr>";
+            var outputText = "";
+            outputText += "<table>";
+            outputText += "<tr>";
             data[0].forEach((item) => {
-                output += "<th>" + item + "</th>";
+                outputText += "<th>" + item + "</th>";
             });
-            output += "</tr>";
-            data.slice(1).forEach((item) => {
-                output += "<tr>";
+            outputText += "</tr>";
+            checkRange(data).forEach((item) => {
+                outputText += "<tr>";
                 item.forEach((item1) => {
-                    output += "<td>" + item1 + "</td>";
+                    outputText += "<td>" + item1 + "</td>";
                 });
-                output += "</tr>";
+                outputText += "</tr>";
             });
-            output += "</table>";
-            outputBox.innerHTML = output;
+
+            outputText += "</table>";
+            outputBox.innerHTML = outputText;
         }
 
         function checkFor(item, i, syntax) {
@@ -160,58 +217,64 @@
             let chartSettings = {
                 type: "line",
                 data: {
-                    labels: dataInv[0].slice(1),
-                    datasets: [
-                        // {
-                        //   label: "Speed [km/h]",
-                        //   data: dataInv[2],
-                        //   borderWidth: 1,
-                        //   fill: "rgba(120, 190, 220, 0.3)",
-                        //   borderColor: "rgba(120, 190, 220, 1)",
-                        //   borderDash: [10, 10],
-                        //   fill: true,
-                        //   cubicInterpolationMode: "default",
-                        //   lineTension: 0.4,
-                        //   pointRadius: 0,
-                        // },
-                        {
-                            label: "Altitude [m]",
-                            data: dataInv[5].slice(1),
-                            borderWidth: 1,
-                            fill: "rgba(30, 190, 220, 0.3)",
-                            borderColor: "rgba(30, 190, 220, 1)",
-                            borderDash: [10, 10],
-                            fill: true,
-                            lineTension: 0.3,
-                            pointRadius: 0,
-                        },
-                        // {
-                        //   label: "Distance [m]",
-                        //   data: dataInv[7].slice(1),
-                        //   borderWidth: 1,
-                        //   fill: "rgba(190, 190, 220, 0.3)",
-                        //   borderColor: "rgba(190, 190, 220, 1)",
-                        //   borderDash: [10, 10],
-                        //   fill: true,
-                        //   cubicInterpolationMode: "default",
-                        //   lineTension: 0.4,
-                        //   pointRadius: 0,
-                        // },
-                    ],
+                    labels: checkRange(dataInv[0]),
+                    datasets: [{
+                        label: "Altitude [m]",
+                        yAxisID: 'altitude',
+                        data: checkRange(dataInv[5]),
+                        borderWidth: 1,
+                        fill: "rgba(166, 166, 166, 0.5)",
+                        borderColor: "rgba(166, 166, 166, 1)",
+                        fill: true,
+                        lineTension: 0.3,
+                        pointRadius: 0,
+                    }, {
+                        label: "Distance [m]",
+                        yAxisID: 'distance',
+                        data: checkRange(dataInv[7]),
+                        borderWidth: 1,
+                        fill: "rgba(30, 30, 255, 0.3)",
+                        borderColor: "rgba(51, 102, 255, 1)",
+                        fill: true,
+                        lineTension: 0.3,
+                        pointRadius: 0,
+                    }, {
+                        label: "Speed [km/h]",
+                        yAxisID: 'speed',
+                        data: checkRange(dataInv[2]),
+                        borderWidth: 1,
+                        fill: "rgba(30, 200, 255, 0.3)",
+                        borderColor: "rgba(51, 190, 255, 1)",
+                        fill: true,
+                        lineTension: 0.3,
+                        pointRadius: 0,
+                    }, ],
                 },
                 options: {
                     responsive: true,
                     legend: {
-                        display: false,
+                        display: true,
                         position: "left",
                     },
                     scales: {
                         yAxes: [{
-                            ticks: {
-                                // beginAtZero: false,
-                                min: 500,
-                            },
-                        }, ],
+                            id: 'altitude',
+                            type: 'linear',
+                            position: 'left',
+                            scalePositionLeft: true,
+                            beginAtZero: true,
+
+                        }, {
+                            id: 'distance',
+                            type: 'linear',
+                            position: 'right',
+                            scalePositionRight: true,
+                        }, {
+                            id: 'speed',
+                            type: 'linear',
+                            position: 'right',
+                            scalePositionRight: true,
+                        }],
                         xAxes: [{
                             ticks: {
                                 beginAtZero: true,
@@ -223,7 +286,10 @@
                     },
                 },
             };
-            let myChart = new Chart(ctx, chartSettings);
+            if (myChart !== undefined) {
+                myChart.destroy();
+            }
+            myChart = new Chart(ctx, chartSettings);
             myChart.update();
         }
     </script>
