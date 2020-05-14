@@ -40,9 +40,8 @@
 <body>
     <form id="frm2" action="action_page.php">
         <input id="fullRangeCheck" type="checkbox" /><label>&nbsp Get Full Range</label><br> From
-        <input id="start" title="Start Range" type="text" />
-        <input id="stop" title="Stop Range" type="text" />
-        <input id="enter" type="button" onclick="getDataRange()" value="Set Data Range" />
+        <input id="start" title="Start Range" type="text" value="0" />
+        <input id="stop" title="Stop Range" type="text" value="9" />
     </form>
     <button id="displayButton" onclick="displayData()">Display Data</button><br />
     <div class="container" height="50%">
@@ -53,19 +52,11 @@
     <br />
 
     <script>
-        var data = [];
-        var dataInv = [];
-        let beginRange;
-        let stopRange;
-        let rangeSet = false;
-        let myChart;
-        let fullRangeBool = false;
-        let parseDataset = [];
-        loadXMLDoc();
+        loadXMLDoc(true);
 
-        function loadXMLDoc() {
-            data = [];
-            dataInv = [];
+        function loadXMLDoc(boolDatasets = false) {
+            let data = [];
+            let dataInv = [];
             var xhttp = new XMLHttpRequest();
             var values = [];
             xhttp.onreadystatechange = function() {
@@ -93,37 +84,49 @@
                         }
                         dataInv.push(buffer);
                     }
+                    console.log(data),
+                        console.log(dataInv);
 
+                    if (boolDatasets) {
+                        let idCount = 0;
+                        data[0].forEach(item => {
+                            let input = document.createElement('input');
+                            let label = document.createElement('label');
+                            let newline = document.createElement('br');
+                            input.type = 'checkbox';
+                            input.id = 'ID:' + idCount;
+                            label.innerHTML = '&nbsp' + item;
+                            document.body.appendChild(input);
+                            document.body.appendChild(label);
+                            document.body.appendChild(newline);
+                            i++;
+                        });
+                    }
 
-
-                    let idCount = 0;
-                    data[0].forEach(item => {
-                        let input = document.createElement('input');
-                        let label = document.createElement('label');
-                        let newline = document.createElement('br');
-                        input.type = 'checkbox';
-                        input.id = 'ID:' + idCount;
-                        label.innerHTML = '&nbsp' + item;
-                        document.body.appendChild(input);
-                        document.body.appendChild(label);
-                        document.body.appendChild(newline);
-                        i++;
-                    });
                 }
 
             };
             xhttp.open("GET", "test.CSV", true);
             xhttp.send();
+
+            return {
+                dataTag: data,
+                testArray: [7, 4, 5, 1, 9, 3],
+                dataInvTag: dataInv,
+            }
         }
 
         function getDataRange() {
-            fullRangeBool = document.getElementById('fullRangeCheck').checked;
-            beginRange = Number(document.getElementById("start").value);
-            stopRange = Number(document.getElementById("stop").value);
-            console.log(beginRange);
-            console.log(stopRange);
-            rangeSet = true;
-            document.getElementById("displayButton").style.backgroundColor = "green";
+            let fullRangeBool = document.getElementById('fullRangeCheck').checked;
+            let beginRange = Number(document.getElementById("start").value);
+            let stopRange = Number(document.getElementById("stop").value);
+            let rangeSet = stopRange > beginRange || fullRangeBool;
+            let rangesData = [beginRange, stopRange];
+            return {
+                fullRangeBool: fullRangeBool,
+                ranges: rangesData,
+                rangeSet: rangeSet,
+            }
         }
 
         function removeData(chart) {
@@ -144,36 +147,35 @@
 
         function dataSetManager() {
             parseDataset = [];
-            for (let i = 0; i < data[0].length, i++) {
-                if (documnet.body.input.id == 'ID:' + i) {
-                    parseDataset[i] = documnet.body.input.value;
-                }
+            for (let i = 0; i < data[0].length; i++) {
+                parseDataset[i] = document.getElementById('ID:' + i);
             }
-
-
+            console.log(parseDataset);
         }
 
         function displayData() {
-            if (rangeSet) {
-                // displayTable();
-                drawChart();
-                console.log(typeof checkRange(dataInv[2]).map(item => parseFloat(item)));
+            let dataRange = getDataRange();
+            let dataXML = loadXMLDoc();
+            if (dataRange.rangeSet) {
+                console.log(dataXML);
+                displayTable(dataXML, dataRange);
+                drawChart(dataXML, dataRange);
             } else {
                 alert("First Enter Your Data Range...");
             }
-
         }
 
-        function checkRange(array) {
-            console.log("BoolRange" + fullRangeBool)
-            if (fullRangeBool) {
-                return array.slice(1, data.length);
+        function checkRange(array, rangeObj) {
+            if (rangeObj.fullRangeBool) {
+                return array.slice(1, array.length);
             } else {
-                return array.slice(1 + beginRange, 1 + stopRange);
+                return array.slice(1 + rangeObj.beginRange, 1 + rangeObj.stopRange);
             }
         }
 
-        function displayTable() {
+        function displayTable(dataObj, rangeObj) {
+            let data = dataObj.data;
+            let dataInv = dataObj.dataInv;
             var outputBox = document.getElementById("xmlOutput");
             var outputText = "";
             outputText += "<table>";
@@ -182,7 +184,7 @@
                 outputText += "<th>" + item + "</th>";
             });
             outputText += "</tr>";
-            checkRange(data).forEach((item) => {
+            checkRange(data, rangeObj).forEach((item) => {
                 outputText += "<tr>";
                 item.forEach((item1) => {
                     outputText += "<td>" + item1 + "</td>";
@@ -212,16 +214,20 @@
             return item;
         }
 
-        function drawChart() {
+        function drawChart(dataObj, rangeObj) {
+            let data = dataObj.data;
+            let dataInv = dataObj.dataInv;
+            console.log(data);
+            console.log(dataInv);
             let ctx = document.getElementById("myChart").getContext("2d");
             let chartSettings = {
                 type: "line",
                 data: {
-                    labels: checkRange(dataInv[0]),
+                    labels: checkRange(dataInv[0], rangeObj),
                     datasets: [{
                         label: "Altitude [m]",
                         yAxisID: 'altitude',
-                        data: checkRange(dataInv[5]),
+                        data: checkRange(dataInv[5], rangeObj),
                         borderWidth: 1,
                         fill: "rgba(166, 166, 166, 0.5)",
                         borderColor: "rgba(166, 166, 166, 1)",
@@ -231,7 +237,7 @@
                     }, {
                         label: "Distance [m]",
                         yAxisID: 'distance',
-                        data: checkRange(dataInv[7]),
+                        data: checkRange(dataInv[7], rangeObj),
                         borderWidth: 1,
                         fill: "rgba(30, 30, 255, 0.3)",
                         borderColor: "rgba(51, 102, 255, 1)",
@@ -241,7 +247,7 @@
                     }, {
                         label: "Speed [km/h]",
                         yAxisID: 'speed',
-                        data: checkRange(dataInv[2]),
+                        data: checkRange(dataInv[2], rangeObj),
                         borderWidth: 1,
                         fill: "rgba(30, 200, 255, 0.3)",
                         borderColor: "rgba(51, 190, 255, 1)",
