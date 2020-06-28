@@ -20,6 +20,7 @@ body {
     font-size: large;
     color: black;
     background-color: white;
+    z-index: 1;
 }
 
 .navBarWrapper {
@@ -213,6 +214,7 @@ body {
     border-bottom: 1px grey solid;
     align-items: center;
     position: relative;
+    /* z-index: -1; */
 }
 .fa-cog {
     color: white;
@@ -320,4 +322,11 @@ body {
 }
 .borderPlaceholder{
     border-right: 1px grey solid;
+}
+
+/* checkBoxes */
+.checkBoxWrapper{
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
 }
