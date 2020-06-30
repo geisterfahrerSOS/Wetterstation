@@ -1,10 +1,14 @@
-add wrap to settings elements
+add wrap to settings elements##
 
-bottom nav bar links
+bottom nav bar links##
 
-add some better formatting in the graph
+add some better formatting in the graph##
 
-change graph heigt
+change graph heigt##
+
+snapshot colors and data
+
+smoothness settings
 
 color pallete:
 #264653 dark blue
@@ -12,3 +16,5 @@ color pallete:
 #E9C46A yellow
 #F4A261 orange
 #E76F51 red
+
+°C

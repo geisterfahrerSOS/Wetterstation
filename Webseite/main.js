@@ -134,17 +134,18 @@ let monthArray = [
     "Dezember",
 ];
 let weekDays = [
-    "Sonntag",
-    "Montag",
-    "Dienstag",
-    "Mittwoch",
-    "Donnerstag",
-    "Freitag",
-    "Samstag",
+    "So",
+    "Mo",
+    "Di",
+    "Mi",
+    "Do",
+    "Fr",
+    "Sa",
 ];
+let smooth = 50;
 let rawData = [];
 let = daysInMonth = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-let d = new Date("January 1 2020");
+let d = new Date();
 document.getElementsByClassName("datePeriod")[0].innerHTML =
     weekDays[d.getDay()] +
     ", " +
@@ -205,6 +206,14 @@ function getData() {
 
 function initListeners() {
     // Initializing datePeriod
+    let slider = document.getElementById("myRange");
+    let sliderOutput = document.getElementsByClassName("sliderValue")[0];
+    slider.oninput = function() {
+        sliderOutput.innerHTML = this.value;
+        smooth = this.value;
+
+    }
+
     let currentDate;
     switch (getSelection().timeFrameValue) {
         case 0:
@@ -514,7 +523,30 @@ function graphEditor(selection) {
             break;
     }
     for (let i = 0; i < 4; i++) {
-        dataSets[i].data = smoothData(rawData[i], 5).slice(sliceObj.start, sliceObj.end);
+        dataSets[i].data = smoothData(rawData[i], parseInt(smooth)).slice(sliceObj.start, sliceObj.end);
+    }
+    let snapShots = document.getElementsByClassName("snapShotItem");
+    //Giving snapshot data
+    for (let i = 0; i < snapShots.length; i++) {
+        let text = Math.floor(dataSets[i].data.reduce((accumulator, currentValue) => accumulator + currentValue) / dataSets[i].data.length);
+        switch (i) {
+            case 0:
+                text += "°C";
+                break;
+            case 1:
+                text += "%";
+                break;
+            case 2:
+                text += "Km/h";
+                break;
+            case 3:
+                text += "°";
+                break;
+            default:
+                break;
+        }
+        console.log(text);
+        snapShots[i].childNodes[1].innerHTML = text;
     }
     while (myChart.data.datasets.length > 0) {
         myChart.options.scales.yAxes.pop();
@@ -585,25 +617,4 @@ function refresh() {
         },
     });
     graphEditor(getSelection());
-    console.log(myChart);
-}
-
-function displayGraph() {
-    var ctx = document.getElementById("myChart").getContext("2d");
-    myChart = new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
-            datasets: [],
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true,
-                    },
-                }, ],
-            },
-        },
-    });
 }
