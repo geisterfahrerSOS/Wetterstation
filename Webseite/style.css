@@ -214,7 +214,8 @@ body {
     border-bottom: 1px grey solid;
     align-items: center;
     position: relative;
-    /* z-index: -1; */
+    height: 37px;
+    /* flex-wrap: wrap;  needs some fixing*/
 }
 .fa-cog {
     color: white;
@@ -222,6 +223,7 @@ body {
 
 .datePeriod{
     padding-right: 30px;
+    width: 270px
 }
 /* changeDate */
 .changeDateWrapper{
@@ -229,6 +231,7 @@ body {
     border-radius: 2px;
     background-color: white;
     color: black;
+    user-select: none;
 }    
 .changeDateWrapper>div{
     padding: 5px 0px 5px 0px;
@@ -257,6 +260,7 @@ body {
     background-color: white;
     color: black;
     margin: 0px 30px 0px 40px;
+    user-select: none;
 }
 .timeFrameSwitch>div{
     padding: 5px 0px 5px 0px;

@@ -2,22 +2,16 @@ var ctx = document.getElementById("myChart").getContext("2d");
 var myChart = new Chart(ctx, {
   type: "line",
   data: {
-    labels: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
-    datasets: [],
+    labels: [1, 2, 3, 4],
+    datasets: [
+      {
+        data: [1, 2, 3, 4],
+      },
+    ],
   },
   options: {
     scales: {
       yAxes: [],
-      xAxes: [{
-        fontSize: 40,
-        ticks: {
-          min: 20,
-          max: 100,
-            callback: function (value, index, values) {
-              return "Hello"+ value;
-            },
-        }
-    }]
     },
   },
 });
@@ -26,9 +20,10 @@ let dataSets = [
     label: "Temperatur",
     yAxisID: "A",
     data: [],
-    borderWidth: 1,
+    borderWidth: 3,
+    pointStyle: "cross",
     borderColor: "red",
-    fill: false,
+    fill: true,
   },
   {
     label: "Luftfeuchtigkeit",
@@ -109,7 +104,6 @@ let yAxes = [
     },
   },
 ];
-let d = new Date();
 let monthArray = [
   "Januar",
   "Februar",
@@ -121,40 +115,38 @@ let monthArray = [
   "August",
   "September",
   "October",
-  "]November",
-  "Dezemmber",
+  "November",
+  "Dezember",
 ];
 let weekDays = [
+  "Sonntag",
   "Montag",
   "Dienstag",
   "Mittwoch",
   "Donnerstag",
   "Freitag",
   "Samstag",
-  "Sonntag",
 ];
-let date = document.getElementsByClassName("datePeriod");
-date.innerHTML = d.getDate() * ".  " + d.getMonth() + ", " + d.getYear();
-
+let rawData = [];
+let = daysInMonth = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+let d = new Date();
+document.getElementsByClassName("datePeriod")[0].innerHTML =
+  weekDays[d.getDay()] +
+  ", " +
+  d.getDate() +
+  ".  " +
+  monthArray[d.getMonth()] +
+  " " +
+  (1900 + d.getYear());
 getData();
 refresh();
 initListeners();
-
-
-
-// let arrows = [];
-// for (let i = 1; i < 3; i += 2) {
-//   arrows.push(
-//     document.getElementsByClassName("changeDateWrapper")[0].childNodes[i]
-//   );
-// }
-// console.log(arrows);
-// for (let i = 0; i < arrows.length; i++) {
-//   let item = arrows[i];
-//   item.addEventListener("click", (event) => {
-//     console.log(item.firstChild);
-//   });
-// }
+function smoothData(dataArray, smoothness){
+  let backData = [];
+  for(let i = 0; i < dataArray.length - smoothness; i++){
+    backData = dataArray.slice(i, i + smoothness).reduce(accumulator, currentValue)/smoothness;
+  }
+}
 function getData() {
   //Hourly Data
   let tempArray = [];
@@ -165,22 +157,76 @@ function getData() {
     if (i === 0) {
       tempArray.push(20 + 5 * (Math.random() - 0.5));
       humidArray.push(70 + 10 * (Math.random() - 0.5));
-      windArray.push(5 + 4 * (Math.random() - 0.5));
+      windArray.push(50 + 4 * (Math.random() - 0.5));
       windDirArray.push(Math.abs(100 + 30 * (Math.random() - 0.5)) % 360);
+    } else {
+      tempArray.push(tempArray[i - 1] + 2 * (Math.random() - 0.5));
+      humidArray.push(humidArray[i - 1] + 10 * (Math.random() - 0.5));
+      windArray.push(windArray[i - 1] + 5 * (Math.random() - 0.5));
+      windDirArray.push(
+        Math.abs(windDirArray[i - 1] + 20 * (Math.random() - 0.5)) % 360
+      );
     }
-    tempArray.push(tempArray[i - 1] + 5 * (Math.random() - 0.5));
-    humidArray.push(humidArray[i - 1] + 5 * (Math.random() - 0.5));
-    windArray.push(windArray[i - 1] + 5 * (Math.random() - 0.5));
-    windDirArray.push(
-      Math.abs(windDirArray[i - 1] + 30 * (Math.random() - 0.5)) % 360
-    );
   }
+  rawData.push(tempArray);
+  rawData.push(humidArray);
+  rawData.push(windArray);
+  rawData.push(windDirArray);
   dataSets[0].data = tempArray;
   dataSets[1].data = humidArray;
   dataSets[2].data = windArray;
   dataSets[3].data = windDirArray;
 }
 function initListeners() {
+  // Initializing datePeriod
+  let currentDate;
+  switch (getSelection().timeFrameValue) {
+    case 0:
+      currentDate =
+        weekDays[d.getDay()] +
+        ", " +
+        d.getDate() +
+        ".  " +
+        monthArray[d.getMonth()] +
+        " " +
+        (1900 + d.getYear());
+      document.getElementsByClassName("datePeriod")[0].innerHTML = currentDate;
+      break;
+    case 1:
+      d.setDate(d.getDate() - 7);
+
+      currentDate =
+        weekDays[d.getDay()] +
+        ", " +
+        d.getDate() +
+        ".  " +
+        monthArray[d.getMonth()] +
+        " " +
+        (1900 + d.getYear());
+
+      d.setDate(d.getDate() + 7);
+
+      currentDate +=
+        " - " +
+        weekDays[d.getDay()] +
+        ", " +
+        d.getDate() +
+        ".  " +
+        monthArray[d.getMonth()] +
+        " " +
+        (1900 + d.getYear());
+      d.setDate(d.getDate() - 7);
+      document.getElementsByClassName("datePeriod")[0].innerHTML = currentDate;
+      break;
+    case 2:
+      d.setMonth(d.getMonth() - 1);
+      currentDate = monthArray[d.getMonth()] + " " + (1900 + d.getYear());
+      document.getElementsByClassName("datePeriod")[0].innerHTML = currentDate;
+    default:
+      break;
+  }
+  document.getElementsByClassName("datePeriod")[0].innerHTML = currentDate;
+  // Timeframe Eventlisteners
   let timeFrame = [];
   timeFrame.push(
     document.getElementsByClassName("timeFrameSwitch")[0].childNodes[1]
@@ -200,8 +246,178 @@ function initListeners() {
       }
       item.style.backgroundColor = "grey";
       item.style.color = "white";
+      let currentDate;
+      switch (getSelection().timeFrameValue) {
+        case 0:
+          currentDate =
+            weekDays[d.getDay()] +
+            ", " +
+            d.getDate() +
+            ".  " +
+            monthArray[d.getMonth()] +
+            " " +
+            (1900 + d.getYear());
+          document.getElementsByClassName(
+            "datePeriod"
+          )[0].innerHTML = currentDate;
+          break;
+        case 1:
+          currentDate =
+            weekDays[d.getDay()] +
+            ", " +
+            d.getDate() +
+            ".  " +
+            monthArray[d.getMonth()] +
+            " " +
+            (1900 + d.getYear());
+
+          d.setDate(d.getDate() + 7);
+
+          currentDate +=
+            " - " +
+            weekDays[d.getDay()] +
+            ", " +
+            d.getDate() +
+            ".  " +
+            monthArray[d.getMonth()] +
+            " " +
+            (1900 + d.getYear());
+          d.setDate(d.getDate() - 7);
+          document.getElementsByClassName(
+            "datePeriod"
+          )[0].innerHTML = currentDate;
+          break;
+        case 2:
+          currentDate = monthArray[d.getMonth()] + " " + (1900 + d.getYear());
+          document.getElementsByClassName(
+            "datePeriod"
+          )[0].innerHTML = currentDate;
+        default:
+          break;
+      }
+      document.getElementsByClassName("datePeriod")[0].innerHTML = currentDate;
     });
   }
+  //Left Right Increments
+  let arrows = [];
+  for (let i = 1; i < 4; i += 2) {
+    arrows.push(
+      document.getElementsByClassName("changeDateWrapper")[0].childNodes[i]
+    );
+  }
+  console.log(arrows);
+  arrows[0].addEventListener("click", (event) => {
+    let currentDate;
+    switch (getSelection().timeFrameValue) {
+      case 0:
+        d.setDate(d.getDate() - 1);
+        currentDate =
+          weekDays[d.getDay()] +
+          ", " +
+          d.getDate() +
+          ".  " +
+          monthArray[d.getMonth()] +
+          " " +
+          (1900 + d.getYear());
+        document.getElementsByClassName(
+          "datePeriod"
+        )[0].innerHTML = currentDate;
+        break;
+      case 1:
+        d.setDate(d.getDate() - 7);
+
+        currentDate =
+          weekDays[d.getDay()] +
+          ", " +
+          d.getDate() +
+          ".  " +
+          monthArray[d.getMonth()] +
+          " " +
+          (1900 + d.getYear());
+
+        d.setDate(d.getDate() + 7);
+
+        currentDate +=
+          " - " +
+          weekDays[d.getDay()] +
+          ", " +
+          d.getDate() +
+          ".  " +
+          monthArray[d.getMonth()] +
+          " " +
+          (1900 + d.getYear());
+        d.setDate(d.getDate() - 7);
+        document.getElementsByClassName(
+          "datePeriod"
+        )[0].innerHTML = currentDate;
+        break;
+      case 2:
+        d.setMonth(d.getMonth() - 1);
+        currentDate = monthArray[d.getMonth()] + " " + (1900 + d.getYear());
+        document.getElementsByClassName(
+          "datePeriod"
+        )[0].innerHTML = currentDate;
+      default:
+        break;
+    }
+    document.getElementsByClassName("datePeriod")[0].innerHTML = currentDate;
+  });
+  arrows[1].addEventListener("click", (event) => {
+    let currentDate;
+    switch (getSelection().timeFrameValue) {
+      case 0:
+        d.setDate(d.getDate() + 1);
+        currentDate =
+          weekDays[d.getDay()] +
+          ", " +
+          d.getDate() +
+          ".  " +
+          monthArray[d.getMonth()] +
+          " " +
+          (1900 + d.getYear());
+        document.getElementsByClassName(
+          "datePeriod"
+        )[0].innerHTML = currentDate;
+        break;
+      case 1:
+        d.setDate(d.getDate() + 7);
+
+        currentDate =
+          weekDays[d.getDay()] +
+          ", " +
+          d.getDate() +
+          ".  " +
+          monthArray[d.getMonth()] +
+          " " +
+          (1900 + d.getYear());
+
+        d.setDate(d.getDate() + 7);
+
+        currentDate +=
+          " - " +
+          weekDays[d.getDay()] +
+          ", " +
+          d.getDate() +
+          ".  " +
+          monthArray[d.getMonth()] +
+          " " +
+          (1900 + d.getYear());
+        d.setDate(d.getDate() - 7);
+        console.log(currentDate);
+        document.getElementsByClassName(
+          "datePeriod"
+        )[0].innerHTML = currentDate;
+        break;
+      case 2:
+        d.setMonth(d.getMonth() + 1);
+        currentDate = monthArray[d.getMonth()] + " " + (1900 + d.getYear());
+        document.getElementsByClassName(
+          "datePeriod"
+        )[0].innerHTML = currentDate;
+      default:
+        break;
+    }
+  });
 }
 function getSelection() {
   let checkBoxes = document.getElementsByClassName("checkBoxWrapper")[0]
@@ -233,18 +449,52 @@ function getSelection() {
     timeFrameValue: timeFrameValue,
   };
 }
-
+function daysYearToDate() {
+  let totalDays = 0;
+  for (let i = 0; i < d.getMonth(); i++) {
+    totalDays += daysInMonth[i];
+  }
+  totalDays += d.getDate() - 1;
+  return totalDays;
+}
 function graphEditor(selection) {
-  // Different Datasets
+  // Different Datasets´
+  //Getting slice values; hours since beginning of the year; zero is Jan 1 2020
+  let sliceObj = {
+    start: 0,
+    end: 10,
+  };
+  switch (selection.timeFrameValue) {
+    case 0:
+      sliceObj.start = 24 * daysYearToDate();
+      sliceObj.end = sliceObj.start + 24;
+      break;
+    case 1:
+      sliceObj.start = 24 * daysYearToDate();
+      sliceObj.end = sliceObj.start + 24 * 7;
+      break;
+    case 2:
+      let accumulator = 0;
+      for (let i = 0; i < d.getMonth(); i++) {
+        accumulator += daysInMonth[i];
+      }
+      sliceObj.start = 24 * accumulator;
+      sliceObj.end = sliceObj.start + 24 * daysInMonth[d.getMonth()];
+      break;
+    default:
+      break;
+  }
+  for (let i = 0; i < 4; i++) {
+    dataSets[i].data = rawData[i].slice(sliceObj.start, sliceObj.end);
+  }
   while (myChart.data.datasets.length > 0) {
-    myChart.data.datasets.pop();
     myChart.options.scales.yAxes.pop();
+    myChart.data.datasets.pop();
   }
   for (let i = 0; i < selection.checkBoxValues.length; i++) {
     if (selection.checkBoxValues[i]) {
-      console.log("Push" + i);
-      myChart.data.datasets.push(dataSets[i]);
       myChart.options.scales.yAxes.push(yAxes[i]);
+      myChart.data.datasets.push(dataSets[i]);
     }
   }
   // Labels
@@ -268,7 +518,7 @@ function graphEditor(selection) {
       }
       break;
     case 2:
-      for (let i = 1; i < 31; i++) {
+      for (let i = 1; i < 744; i++) {
         myChart.data.labels.push(i);
       }
       break;
@@ -276,10 +526,8 @@ function graphEditor(selection) {
     default:
       break;
   }
-
   myChart.update();
 }
-
 function getXML() {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function () {
@@ -291,33 +539,23 @@ function getXML() {
   xhttp.open("GET", "text.txt", true);
   xhttp.send();
 }
-
 function refresh() {
-  console.log("refreshing");
   myChart.destroy();
   myChart = new Chart(ctx, {
     type: "line",
     data: {
-      labels: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+      labels: [],
       datasets: [],
     },
     options: {
       scales: {
-        yAxes: [
-          {
-            ticks: {
-              beginAtZero: true,
-            },
-          },
-        ],
+        yAxes: [],
       },
     },
   });
-  console.log(getSelection());
   graphEditor(getSelection());
   console.log(myChart);
 }
-
 function displayGraph() {
   var ctx = document.getElementById("myChart").getContext("2d");
   myChart = new Chart(ctx, {
