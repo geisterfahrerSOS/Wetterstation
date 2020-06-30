@@ -1,4 +1,5 @@
 var ctx = document.getElementById("myChart").getContext("2d");
+// ctx.height = 900;
 var myChart = new Chart(ctx, {
   type: "line",
   data: {
@@ -9,7 +10,9 @@ var myChart = new Chart(ctx, {
       },
     ],
   },
+
   options: {
+    maintainAspectRatio: false,
     scales: {
       yAxes: [],
     },
@@ -20,33 +23,36 @@ let dataSets = [
     label: "Temperatur",
     yAxisID: "A",
     data: [],
-    borderWidth: 3,
-    pointStyle: "cross",
     borderColor: "red",
-    fill: true,
+    borderWidth: 2,
+    pointRadius: 0,
+    fill: false,
   },
   {
     label: "Luftfeuchtigkeit",
     yAxisID: "B",
     data: [],
-    borderWidth: 1,
     borderColor: "yellow",
+    borderWidth: 2,
+    pointRadius: 0,
     fill: false,
   },
   {
     label: "Windgeschwindigkeit",
     yAxisID: "C",
     data: [],
-    borderWidth: 1,
     borderColor: "blue",
+    borderWidth: 2,
+    pointRadius: 0,
     fill: false,
   },
   {
     label: "Windrichtung",
     yAxisID: "D",
     data: [],
-    borderWidth: 1,
     borderColor: "green",
+    borderWidth: 2,
+    pointRadius: 0,
     fill: false,
   },
 ];
@@ -56,7 +62,9 @@ let yAxes = [
     type: "linear",
     position: "left",
     labelString: "Grad Celsius",
+    color: "red",
     ticks: {
+      fontColor: "#999",
       min: -10,
       max: 50,
       callback: function (value, index, values) {
@@ -69,6 +77,7 @@ let yAxes = [
     type: "linear",
     position: "left",
     ticks: {
+      fontColor: "#999",
       min: 0,
       max: 100,
       callback: function (value, index, values) {
@@ -83,6 +92,7 @@ let yAxes = [
     position: "right",
     labelString: "Windgeschwindigkeit",
     ticks: {
+      fontColor: "#999",
       min: 0,
       max: 80,
       callback: function (value, index, values) {
@@ -96,6 +106,7 @@ let yAxes = [
     position: "right",
     labelString: "Windrichtung",
     ticks: {
+      fontColor: "#999",
       min: 0,
       max: 360,
       callback: function (value, index, values) {
@@ -141,11 +152,19 @@ document.getElementsByClassName("datePeriod")[0].innerHTML =
 getData();
 refresh();
 initListeners();
-function smoothData(dataArray, smoothness){
+console.log(smoothData([1,4 ,6 , 7,8,4,8,2,5,7,8,9,0],3));
+function smoothData(dataArray, smoothness) {
   let backData = [];
-  for(let i = 0; i < dataArray.length - smoothness; i++){
-    backData = dataArray.slice(i, i + smoothness).reduce(accumulator, currentValue)/smoothness;
+  for (let i = 0; i < dataArray.length - smoothness; i++) {
+    backData.push(
+      dataArray.slice(i, i + smoothness).reduce((accumulator, currentValue) => accumulator + currentValue) /
+        smoothness
+    );
   }
+  for (let i = dataArray.length - smoothness; i < dataArray.length; i++) {
+    backData.push(dataArray[i]);
+  }
+  return backData;
 }
 function getData() {
   //Hourly Data
@@ -485,7 +504,7 @@ function graphEditor(selection) {
       break;
   }
   for (let i = 0; i < 4; i++) {
-    dataSets[i].data = rawData[i].slice(sliceObj.start, sliceObj.end);
+    dataSets[i].data = smoothData(rawData[i], 10).slice(sliceObj.start, sliceObj.end);
   }
   while (myChart.data.datasets.length > 0) {
     myChart.options.scales.yAxes.pop();
