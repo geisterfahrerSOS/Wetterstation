@@ -19,6 +19,7 @@ var myChart = new Chart(ctx, {
 let dataSets = [{
         label: "Temperatur",
         yAxisID: "A",
+        // xAxisID: "Z",
         data: [],
         borderColor: "#C53815",
         borderWidth: 2,
@@ -84,7 +85,7 @@ let yAxes = [{
             display: true,
             labelString: "Prozent Leftfeuchte",
             fontColor: "#177469",
-        }
+        },
     },
     {
         id: "C",
@@ -93,14 +94,14 @@ let yAxes = [{
         ticks: {
             fontColor: "#D39E19",
             callback: function(value, index, values) {
-                return value + "Km/h";
+                return value + " km/h";
             },
         },
         scaleLabel: {
             display: true,
             labelString: "Windgeschwindigkeit",
             fontColor: "#D39E19",
-        }
+        },
     },
     {
         id: "D",
@@ -133,15 +134,7 @@ let monthArray = [
     "November",
     "Dezember",
 ];
-let weekDays = [
-    "So",
-    "Mo",
-    "Di",
-    "Mi",
-    "Do",
-    "Fr",
-    "Sa",
-];
+let weekDays = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
 let smooth = 50;
 let rawData = [];
 let = daysInMonth = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -154,16 +147,19 @@ document.getElementsByClassName("datePeriod")[0].innerHTML =
     monthArray[d.getMonth()] +
     " " +
     (1900 + d.getYear());
+initListeners();
 getData();
 refresh();
-initListeners();
+
 console.log(smoothData([1, 4, 6, 7, 8, 4, 8, 2, 5, 7, 8, 9, 0], 3));
 
 function smoothData(dataArray, smoothness) {
     let backData = [];
     for (let i = 0; i < dataArray.length - smoothness; i++) {
         backData.push(
-            dataArray.slice(i, i + smoothness).reduce((accumulator, currentValue) => accumulator + currentValue) /
+            dataArray
+            .slice(i, i + smoothness)
+            .reduce((accumulator, currentValue) => accumulator + currentValue) /
             smoothness
         );
     }
@@ -211,8 +207,7 @@ function initListeners() {
     slider.oninput = function() {
         sliderOutput.innerHTML = this.value;
         smooth = this.value;
-
-    }
+    };
 
     let currentDate;
     switch (getSelection().timeFrameValue) {
@@ -523,12 +518,19 @@ function graphEditor(selection) {
             break;
     }
     for (let i = 0; i < 4; i++) {
-        dataSets[i].data = smoothData(rawData[i], parseInt(smooth)).slice(sliceObj.start, sliceObj.end);
+        dataSets[i].data = smoothData(rawData[i], parseInt(smooth)).slice(
+            sliceObj.start,
+            sliceObj.end
+        );
     }
     let snapShots = document.getElementsByClassName("snapShotItem");
     //Giving snapshot data
     for (let i = 0; i < snapShots.length; i++) {
-        let text = Math.floor(dataSets[i].data.reduce((accumulator, currentValue) => accumulator + currentValue) / dataSets[i].data.length);
+        let text = Math.floor(
+            dataSets[i].data.reduce(
+                (accumulator, currentValue) => accumulator + currentValue
+            ) / dataSets[i].data.length
+        );
         switch (i) {
             case 0:
                 text += "°C";
@@ -573,14 +575,15 @@ function graphEditor(selection) {
             }
             break;
         case 1:
-            for (let i = 1; i < 169; i++) {
+            for (let i = 1; i < 168; i++) {
                 //change Date depending on month
-                myChart.data.labels.push(i);
+                myChart.data.labels.push(weekDays[Math.floor(i / 24)]);
             }
             break;
         case 2:
-            for (let i = 1; i < 744; i++) {
-                myChart.data.labels.push(i);
+            for (let i = 1; i < 24 * daysInMonth[d.getMonth()]; i++) {
+                //change Date depending on month
+                myChart.data.labels.push(Math.floor(i / 24) + "/" + (d.getMonth() + 1));
             }
             break;
 
@@ -613,6 +616,11 @@ function refresh() {
         options: {
             scales: {
                 yAxes: [],
+                xAxes: [{
+                    ticks: {
+                        autoSkipPadding: 38,
+                    }
+                }]
             },
         },
     });

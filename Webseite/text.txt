@@ -6,11 +6,15 @@ add some better formatting in the graph##
 
 change graph heigt##
 
-snapshot colors and data
+snapshot colors and data##
 
-smoothness settings
+smoothness settings##
 
-color pallete:
+x axes formatting##
+
+fontawesome ##
+
+color pallete:##
 #264653 dark blue
 #2A9D8F light blue
 #E9C46A yellow

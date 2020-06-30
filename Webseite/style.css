@@ -216,9 +216,9 @@ body {
     padding: 7px;
     border-bottom: 1px grey solid;
     align-items: center;
-    height: 37px;
+    /* height: 37px; */
     justify-content: space-between;
-    /* flex-wrap: wrap;  needs some fixing*/
+    flex-wrap: wrap;
 }
 
 .fa-cog {
