@@ -1,7 +1,7 @@
 var ctx = document.getElementById("myChart").getContext("2d");
 // ctx.height = 900;
 var myChart = new Chart(ctx, {
-    type: "bar",
+    type: "line",
     data: {
         labels: [1, 2, 3, 4],
         datasets: [{
@@ -629,7 +629,7 @@ function getXML() {
 function refresh() {
     myChart.destroy();
     myChart = new Chart(ctx, {
-        type: "bar",
+        type: "line",
         data: {
             labels: [],
             datasets: [],

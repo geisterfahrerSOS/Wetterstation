@@ -428,6 +428,10 @@ body {
     width: 70%;
 }
 
+.marcoContentWrapper {
+    width: 70%;
+}
+
 .projektChooser {
     z-index: 1;
     /* position: fixed; */
