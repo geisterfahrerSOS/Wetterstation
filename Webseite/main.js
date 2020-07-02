@@ -1,7 +1,7 @@
 var ctx = document.getElementById("myChart").getContext("2d");
 // ctx.height = 900;
 var myChart = new Chart(ctx, {
-    type: "line",
+    type: "bar",
     data: {
         labels: [1, 2, 3, 4],
         datasets: [{
@@ -10,6 +10,9 @@ var myChart = new Chart(ctx, {
     },
 
     options: {
+        legend: {
+            display: false,
+        },
         maintainAspectRatio: false,
         scales: {
             yAxes: [{
@@ -26,7 +29,6 @@ var myChart = new Chart(ctx, {
 let dataSets = [{
         label: "Lufttemperatur",
         yAxisID: "A",
-        // xAxisID: "Z",
         data: [],
         borderColor: "#C53815",
         borderWidth: 2,
@@ -627,12 +629,15 @@ function getXML() {
 function refresh() {
     myChart.destroy();
     myChart = new Chart(ctx, {
-        type: "line",
+        type: "bar",
         data: {
             labels: [],
             datasets: [],
         },
         options: {
+            legend: {
+                display: false,
+            },
             scales: {
                 yAxes: [{
                     display: false,
@@ -652,4 +657,5 @@ function refresh() {
         },
     });
     graphEditor(getSelection());
+    console.log(myChart);
 }

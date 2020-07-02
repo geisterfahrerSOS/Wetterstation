@@ -445,6 +445,7 @@ body {
     border-bottom: 2px solid;
     border-color: transparent;
     transition: 0.3s;
+    user-select: none;
 }
 
 .projektChooser>div:hover {
